@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>IT255-DZ03-3496</title>
+    <style>
+        table {
+            width: 100%;
+            font: 17px Calibri;
+        }
+        body {
+            background-color: gray;
+}
+
+        table,
+        th,
+        td {
+            border: solid 1px #DDD;
+            border-collapse: collapse;
+            padding: 2px 3px;
+            text-align: center;
+        }
+
+        input[type='button'] {
+            font: 15px Calibri;
+            cursor: pointer;
+            border: none;
+            color: #FFF;
+        }
+
+        input[type='text'],
+        select {
+            font: 17px Calibri;
+            text-align: center;
+            border: solid 1px #CCC;
+            width: auto;
+            padding: 2px 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container" style="width:700px;">
+    </div>
+</body>
+
+<script>
+    var crudApp = new function () {
+
+
+        this.myStudent = [
+            { ID: '1', Ime: 'Uros Zukancic', Smer: 'IT', Indeks: 3496 },
+            { ID: '2', Ime: 'Luka Sekulic', Smer: 'IS', Indeks: 3278 },
+            { ID: '3', Ime: 'Damjan Stefanovic', Smer: 'SE', Indeks: 3232 }
+        ]
+
+        this.smer = ['IT', 'SE', 'IS', 'CS'];
+        this.col = [];
+
+        this.createTable = function () {
+
+            for (var i = 0; i < this.myStudent.length; i++) {
+                for (var key in this.myStudent[i]) {
+                    if (this.col.indexOf(key) === -1) {
+                        this.col.push(key);
+                    }
+                }
+            }
+
+            var table = document.createElement('table');
+            table.setAttribute('id', 'studentTable');
+
+            var tr = table.insertRow(-1);
+
+            for (var h = 0; h < this.col.length; h++) {
+                var th = document.createElement('th');
+                th.innerHTML = this.col[h].replace('_', ' ');
+                tr.appendChild(th);
+            }
+
+            for (var i = 0; i < this.myStudent.length; i++) {
+
+                tr = table.insertRow(-1);
+
+                for (var j = 0; j < this.col.length; j++) {
+                    var tabCell = tr.insertCell(-1);
+                    tabCell.innerHTML = this.myStudent[i][this.col[j]];
+                }
+
+
+                this.td = document.createElement('td');
+
+                tr.appendChild(this.td);
+                var lblOtkazi = document.createElement('label');
+                lblOtkazi.innerHTML = '✖';
+                lblOtkazi.setAttribute('onclick', 'crudApp.Otkazi(this)');
+                lblOtkazi.setAttribute('style', 'display:none;');
+                lblOtkazi.setAttribute('title', 'Otkazi');
+                lblOtkazi.setAttribute('id', 'lbl' + i);
+                this.td.appendChild(lblOtkazi);
+
+                tr.appendChild(this.td);
+                var btCuvanje = document.createElement('input');
+
+                btCuvanje.setAttribute('type', 'button');
+                btCuvanje.setAttribute('value', 'Cuvanje');
+                btCuvanje.setAttribute('id', 'Cuvanje' + i);
+                btCuvanje.setAttribute('style', 'display:none;');
+                btCuvanje.setAttribute('onclick', 'crudApp.Cuvanje(this)');
+                this.td.appendChild(btCuvanje);
+
+                tr.appendChild(this.td);
+                var btIzmena = document.createElement('input');
+
+                btIzmena.setAttribute('type', 'button');
+                btIzmena.setAttribute('value', 'Izmena');
+                btIzmena.setAttribute('id', 'Edit' + i);
+                btIzmena.setAttribute('style', 'background-color:#44CCEB;');
+                btIzmena.setAttribute('onclick', 'crudApp.Izmena(this)');
+                this.td.appendChild(btIzmena);
+
+                this.td = document.createElement('th');
+                tr.appendChild(this.td);
+                var btBrisanje = document.createElement('input');
+                btBrisanje.setAttribute('type', 'button');
+                btBrisanje.setAttribute('value', 'Brisanje');
+                btBrisanje.setAttribute('style', 'background-color:#ED5650;');
+                btBrisanje.setAttribute('onclick', 'crudApp.Brisanje(this)');
+                this.td.appendChild(btBrisanje);
+            }
+
+
+
+            tr = table.insertRow(-1);
+
+            for (var j = 0; j < this.col.length; j++) {
+                var newCell = tr.insertCell(-1);
+                if (j >= 1) {
+
+                    if (j == 2) {
+
+                        var select = document.createElement('select');
+                        select.innerHTML = '<option value=""></option>';
+                        for (k = 0; k < this.smer.length; k++) {
+                            select.innerHTML = select.innerHTML +
+                                '<option value="' + this.smer[k] + '">' + this.smer[k] + '</option>';
+                        }
+                        newCell.appendChild(select);
+                    }
+                    else {
+                        var tBox = document.createElement('input');
+                        tBox.setAttribute('type', 'text');
+                        tBox.setAttribute('value', '');
+                        newCell.appendChild(tBox);
+                    }
+                }
+            }
+
+            this.td = document.createElement('td');
+            tr.appendChild(this.td);
+
+            var btNew = document.createElement('input');
+
+            btNew.setAttribute('type', 'button');
+            btNew.setAttribute('value', 'Dodaj');
+            btNew.setAttribute('id', 'New' + i);
+            btNew.setAttribute('style', 'background-color:#207DD1;');
+            btNew.setAttribute('onclick', 'crudApp.CreateNew(this)');
+            this.td.appendChild(btNew);
+
+            var div = document.getElementById('container');
+            div.innerHTML = '';
+            div.appendChild(table);
+        };
+
+
+        this.Otkazi = function (oButton) {
+
+            oButton.setAttribute('style', 'display:none; float:none;');
+
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+
+            var btCuvanje = document.getElementById('Cuvanje' + (activeRow - 1));
+            btCuvanje.setAttribute('style', 'display:none;');
+
+            var btIzmena = document.getElementById('Edit' + (activeRow - 1));
+            btIzmena.setAttribute('style', 'display:block; margin:0 auto; background-color:#44CCEB;');
+
+            var tab = document.getElementById('studentTable').rows[activeRow];
+
+            for (i = 0; i < this.col.length; i++) {
+                var td = tab.getElementsByTagName("td")[i];
+                td.innerHTML = this.myStudent[(activeRow - 1)][this.col[i]];
+            }
+        }
+
+
+        this.Izmena = function (oButton) {
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+            var tab = document.getElementById('studentTable').rows[activeRow];
+
+            for (i = 1; i < 4; i++) {
+                if (i == 2) {
+                    var td = tab.getElementsByTagName("td")[i];
+                    var ele = document.createElement('select');
+                    ele.innerHTML = '<option value="' + td.innerText + '">' + td.innerText + '</option>';
+                    for (k = 0; k < this.smer.length; k++) {
+                        ele.innerHTML = ele.innerHTML +
+                            '<option value="' + this.smer[k] + '">' + this.smer[k] + '</option>';
+                    }
+                    td.innerText = '';
+                    td.appendChild(ele);
+                }
+                else {
+                    var td = tab.getElementsByTagName("td")[i];
+                    var ele = document.createElement('input');
+                    ele.setAttribute('type', 'text');
+                    ele.setAttribute('value', td.innerText);
+                    td.innerText = '';
+                    td.appendChild(ele);
+                }
+            }
+
+            var lblOtkazi = document.getElementById('lbl' + (activeRow - 1));
+            lblOtkazi.setAttribute('style', 'cursor:pointer; display:block; width:20px; float:left; position: absolute;');
+
+            var btCuvanje = document.getElementById('Cuvanje' + (activeRow - 1));
+            btCuvanje.setAttribute('style', 'display:block; margin-left:30px; float:left; background-color:#2DBF64;');
+
+            oButton.setAttribute('style', 'display:none;');
+        };
+
+
+        this.Brisanje = function (oButton) {
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+            this.myStudent.splice((activeRow - 1), 1);
+            this.createTable();
+        };
+
+        this.Cuvanje = function (oButton) {
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+            var tab = document.getElementById('studentTable').rows[activeRow];
+
+            for (i = 1; i < this.col.length; i++) {
+                var td = tab.getElementsByTagName("td")[i];
+                if (td.childNodes[0].getAttribute('type') == 'text' || td.childNodes[0].tagName == 'SELECT') {  // CHECK IF ELEMENT IS A TEXTBOX OR SELECT.
+                    this.myStudent[(activeRow - 1)][this.col[i]] = td.childNodes[0].value;
+                }
+            }
+            this.createTable();
+        }
+
+        this.CreateNew = function (oButton) {
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+            var tab = document.getElementById('studentTable').rows[activeRow];
+            var obj = {};
+
+            for (i = 1; i < this.col.length; i++) {
+                var td = tab.getElementsByTagName("td")[i];
+                if (td.childNodes[0].getAttribute('type') == 'text' || td.childNodes[0].tagName == 'SELECT') {
+                    var txtVal = td.childNodes[0].value;
+                    if (txtVal != '') {
+                        obj[this.col[i]] = txtVal.trim();
+                    }
+                    else {
+                        obj = '';
+                        alert('Sva polja moraju biti popunjena');
+                        break;
+                    }
+                }
+            }
+            obj[this.col[0]] = this.myStudent.length + 1;
+
+            if (Object.keys(obj).length > 0) {
+                this.myStudent.push(obj);
+                this.createTable();
+            }
+        }
+
+    }
+
+    crudApp.createTable();
+</script>
+
+</html>
